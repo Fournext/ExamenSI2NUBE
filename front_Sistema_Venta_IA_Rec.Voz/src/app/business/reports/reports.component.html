@@ -80,7 +80,7 @@
                           <td class="py-2 px-4 border-b">{{ producto.descripcion_producto }}</td>
                           <td class="py-2 px-4 border-b">{{ producto.cantidad }}</td>
                           <td class="py-2 px-4 border-b">{{ producto.precio_unitario | currency:'Bs ':'symbol' }}</td>
-                          <td class="py-2 px-4 border-b">{{ producto.subtotal | currency:'Bs ':'symbol' }}</td>
+                          <td class="py-2 px-4 border-b">{{ producto.importe | currency:'Bs ':'symbol' }}</td>
                           <td class="py-2 px-4 border-b" *ngIf="i === 0" [attr.rowspan]="compra.productos.length">
                             {{ compra.subtotal | currency:'Bs ':'symbol' }}
                           </td>
