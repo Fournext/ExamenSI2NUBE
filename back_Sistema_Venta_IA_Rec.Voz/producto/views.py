@@ -174,8 +174,10 @@ def obtener_detalles_factura_df():
         rows = cursor.fetchall()
     return pd.DataFrame(rows, columns=columns)
 
+
 def combinar_features(row):
     return f"{row['descripcion_producto']} {row['marca']} {row['descripcion_marca']} {row['categoria']}"
+
 
 @api_view(['POST'])
 def recomendar_productos_por_lista(request):
@@ -184,42 +186,58 @@ def recomendar_productos_por_lista(request):
         if not ids_producto:
             return Response({"error": "No se enviaron productos"}, status=400)
 
-        # Paso 1: Obtener datos
-        df = obtener_detalles_factura_df()
-        df.drop_duplicates(subset="id_producto", inplace=True)
-        df['caracteristicas'] = df.apply(combinar_features, axis=1)
+        # 1. Obtener datos completos desde la función SQL
+        df_completo = obtener_detalles_factura_df()
 
-        # Paso 2: Stopwords en español con NLTK
+        # 2. Crear versión reducida para vectorizar sin duplicados y resetear índice
+        df_vector = df_completo.drop_duplicates(subset="id_producto").copy().reset_index(drop=True)
+        df_vector['caracteristicas'] = df_vector.apply(combinar_features, axis=1)
+
+        # 3. Preparar stopwords y vectorizar
         stopwords_es = stopwords.words('spanish')
-
-        # Paso 3: Vectorizar texto con TF-IDF
         vectorizer = TfidfVectorizer(stop_words=stopwords_es)
-        tfidf_matrix = vectorizer.fit_transform(df['caracteristicas'])
+        tfidf_matrix = vectorizer.fit_transform(df_vector['caracteristicas'])
         similitudes = linear_kernel(tfidf_matrix, tfidf_matrix)
 
-        # Paso 4: Cantidades históricas para ponderar
-        df_cant = obtener_detalles_factura_df()
-        cantidades_totales = df_cant.groupby("id_producto")["cantidad"].sum().to_dict()
+        # 4. Agrupar cantidades históricas por producto
+        cantidades_totales = df_completo.groupby("id_producto")["cantidad"].sum().to_dict()
 
-        # Paso 5: Calcular recomendaciones ponderadas
-        indices_base = df[df['id_producto'].isin(ids_producto)].index.tolist()
+        # 5. Verificar existencia de productos enviados
+        productos_validos = df_vector[df_vector['id_producto'].isin(ids_producto)]
+        if productos_validos.empty:
+            return Response({
+                "error": "Ninguno de los productos enviados fue encontrado en el historial"
+            }, status=404)
+
+        # 6. Calcular puntuación ponderada por cantidad
         scores_totales = {}
+        for idx, row in df_vector.iterrows():
+            if row['id_producto'] in ids_producto:
+                peso = cantidades_totales.get(row['id_producto'], 1)
+                simil_scores = list(enumerate(similitudes[idx]))
+                for i, score in simil_scores:
+                    id_simil = df_vector.iloc[i]['id_producto']
+                    if id_simil not in ids_producto:
+                        scores_totales[i] = scores_totales.get(i, 0) + score * peso
 
-        for idx in indices_base:
-            id_base = df.iloc[idx]['id_producto']
-            peso = cantidades_totales.get(id_base, 1)
+        if not scores_totales:
+            return Response({
+                "error": "No se encontraron productos similares para recomendar"
+            }, status=404)
 
-            simil_scores = list(enumerate(similitudes[idx]))
-            for i, score in simil_scores:
-                id_simil = df.iloc[i]['id_producto']
-                if id_simil not in ids_producto:
-                    scores_totales[i] = scores_totales.get(i, 0) + score * peso
-
-        # Paso 6: Top 5 resultados
+        # 7. Filtrar índices válidos (evitar index errors)
         top_indices = sorted(scores_totales.items(), key=lambda x: x[1], reverse=True)[:5]
-        resultado = df.iloc[[i[0] for i in top_indices]][['id_producto', 'descripcion_producto', 'marca', 'categoria']]
+        valid_indices = [i[0] for i in top_indices if i[0] < len(df_vector)]
+
+        if not valid_indices:
+            return Response({"error": "No se encontraron productos válidos para recomendar"}, status=404)
+
+        resultado = df_vector.iloc[valid_indices][[
+            'id_producto', 'descripcion_producto', 'marca', 'categoria'
+        ]]
 
         return Response(resultado.to_dict(orient='records'))
 
     except Exception as e:
+        print("ERROR:", e)
         return Response({"error": str(e)}, status=500)
