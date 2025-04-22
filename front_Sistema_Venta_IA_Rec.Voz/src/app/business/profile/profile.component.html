@@ -1,0 +1,101 @@
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md">
+  <!-- Encabezado -->
+  <div class="text-center mb-6">
+    <!-- Imagen del perfil -->
+    <img 
+      [src]="imagePreview || imagenURL || 'assets/default-profile.png'" 
+      alt="User Profile Picture"
+      class="w-32 h-32 mx-auto rounded-full border-4 border-blue-500 shadow-md" />
+ <!-- Imagen más grande -->
+    <!-- Botón mejorado para cambiar la foto -->
+    <label class="mt-4 inline-block px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white text-sm font-semibold rounded-lg shadow-lg cursor-pointer hover:opacity-90 transition duration-300">
+      Subir Foto de Perfil
+      <input type="file" class="hidden" (change)="onImageUpload($event)" />
+    </label>
+    <!-- Información del perfil -->
+    <h2 class="mt-4 text-xl font-bold text-blue-gray-900">{{ newEmpleado.nombre_completo }}</h2>
+    <p class="text-sm text-blue-gray-600">{{ newEmpleado.rol }}</p>
+  </div>
+
+
+  <!-- Información del usuario -->
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <label class="block text-sm font-medium text-blue-gray-700">Nombre</label>
+      <input type="text"
+        class="mt-1 block w-full border border-blue-gray-300 rounded-lg text-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+        [value]="newEmpleado.nombre_completo" disabled />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-blue-gray-700">Correo Electrónico</label>
+      <input type="email"
+        class="mt-1 block w-full border border-blue-gray-300 rounded-lg text-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+        [value]="newUser.email" disabled />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-blue-gray-700">Teléfono</label>
+      <input type="text"
+        class="mt-1 block w-full border border-blue-gray-300 rounded-lg text-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+        [value]="newEmpleado.telefono" disabled />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-blue-gray-700">Dirección</label>
+      <input type="text"
+        class="mt-1 block w-full border border-blue-gray-300 rounded-lg text-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+        [value]="newEmpleado.direccion" disabled />
+    </div>
+    <div>
+      <label class="block text-sm font-medium text-blue-gray-700">Fecha de nacimiento</label>
+      <input type="text"
+        class="mt-1 block w-full border border-blue-gray-300 rounded-lg text-sm p-2 focus:ring-blue-500 focus:border-blue-500"
+        [value]="newEmpleado.fecha_nacimiento | date:'dd/MM/yyyy'" disabled />
+    </div>
+  </div>
+
+  <!-- Botones -->
+  <div class="mt-6 flex justify-between">
+    <button
+      (click)="abrirModal()"
+      class="px-4 py-2 bg-blue-500 text-white text-sm font-medium rounded-lg shadow-md hover:bg-blue-600 focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75">
+      Editar Información
+    </button>
+  </div>
+</div>
+
+<!-- Modal -->
+<div *ngIf="mostrarModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white p-6 rounded-lg w-full max-w-lg shadow-lg relative">
+    <h2 class="text-lg font-bold mb-4">Editar Información</h2>
+
+    <div class="grid grid-cols-1 gap-4">
+      <div>
+        <label class="text-sm font-medium">Nombre</label>
+        <input type="text" [(ngModel)]="formData.nombre" class="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Correo</label>
+        <input type="email" [(ngModel)]="formData.email" class="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Teléfono</label>
+        <input type="text" [(ngModel)]="formData.telefono" class="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Dirección</label>
+        <input type="text" [(ngModel)]="formData.direccion" class="w-full p-2 border rounded" />
+      </div>
+      <div>
+        <label class="text-sm font-medium">Fecha de nacimiento</label>
+        <input type="date" [(ngModel)]="formData.fecha_nacimiento" class="w-full p-2 border rounded" />
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="mt-6 flex justify-end space-x-2">
+      <button (click)="mostrarModal = false"
+        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+      <button (click)="guardarCambios()"
+        class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar</button>
+    </div>
+  </div>
+</div>

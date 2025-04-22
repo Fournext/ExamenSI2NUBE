@@ -1,0 +1,68 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+    <h1 class="text-2xl font-bold text-gray-700 mb-4">Gestión de Marcas</h1>
+
+    <!-- Botón para mostrar el formulario -->
+    <button *ngIf="perm_insertar" class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" (click)="toggleForm()">
+        {{ showForm ? 'Cerrar Formulario' : 'Agregar Marca' }}
+    </button>
+
+    <!-- Formulario para agregar marca -->
+    <div *ngIf="showForm" class="bg-white p-4 shadow-md rounded mb-4">
+        <h2 class="text-xl font-bold mb-4">Nueva Marca</h2>
+        <form (ngSubmit)="addBrand()">
+            <div class="mb-4">
+                <label class="block text-gray-700">Nombre:</label>
+                <input type="text" [(ngModel)]="newMarca.nombre" name="name" class="w-full px-3 py-2 border rounded"
+                    placeholder="Ingresa el nombre de la marca" required />
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Descripción:</label>
+                <textarea [(ngModel)]="newMarca.descripcion_marca" name="description" class="w-full px-3 py-2 border rounded"
+                    placeholder="Ingresa una descripción de la marca" required></textarea>
+            </div>
+
+
+            <div class="flex gap-4">
+                <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                    Guardar
+                </button>
+                <button type="button" (click)="toggleForm()"
+                    class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de marcas -->
+    <div class="overflow-x-auto bg-white shadow-md rounded">
+        <table class="w-full text-left border-collapse text-sm">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="py-2 px-4 border-b">ID</th>
+                    <th class="py-2 px-4 border-b">Nombre</th>
+                    <th class="py-2 px-4 border-b">Descripción</th>
+                    <th class="py-2 px-4 border-b">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let marca of marcas" class="hover:bg-gray-100">
+                    <td class="py-2 px-4 border-b">{{ marca.id }}</td>
+                    <td class="py-2 px-4 border-b">{{ marca.nombre }}</td>
+                    <td class="py-2 px-4 border-b">{{ marca.descripcion_marca }}</td>
+                    <td class="py-2 px-4 border-b">
+                        <button *ngIf="perm_editar" class="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600 mr-2"
+                            (click)="editBrand(marca.id)">
+                            Editar
+                        </button>
+                        <button *ngIf="perm_eliminar" class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
+                            (click)="deleteBrand(marca.id)">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

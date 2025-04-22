@@ -1,0 +1,93 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+    <h1 class="text-2xl font-bold text-gray-700 mb-4">Gestión de Inventarios</h1>
+
+    <!-- Botón para mostrar el formulario -->
+    <button *ngIf="perm_insertar" class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" (click)="toggleForm()">
+        {{ showForm ? 'Cerrar Formulario' : 'Agregar Inventario' }}
+    </button>
+
+    <!-- Formulario para agregar inventario -->
+    <div *ngIf="showForm" class="bg-white p-4 shadow-md rounded mb-4">
+        <h2 class="text-xl font-bold mb-4">Nuevo Inventario</h2>
+        <form>
+            <div class="mb-4">
+                <label class="block text-gray-700">Producto:</label>
+                <select [(ngModel)]="newInventario.id_producto" name="productName"
+                    class="w-full px-3 py-2 border rounded" required>
+                    <option value="" disabled selected>Selecciona un producto</option>
+                    <option *ngFor="let product of productos" [value]="product.id">{{ product.descripcion }}</option>
+                </select>
+            </div>
+
+
+            <div class="mb-4">
+                <label class="block text-gray-700">Stock Mínimo:</label>
+                <input type="number" [(ngModel)]="newInventario.cantidad" name="minimumStock"
+                    class="w-full px-3 py-2 border rounded" placeholder="Ingresa el stock mínimo" required />
+            </div>
+
+            <div class="flex gap-4">
+                <button type="submit" (click)="addInventory()"
+                    class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">
+                    Guardar
+                </button>
+                <button type="button" (click)="toggleForm()"
+                    class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabla de inventarios -->
+    <div class="overflow-x-auto bg-white shadow-md rounded">
+        <table class="w-full text-left border-collapse text-sm">
+            <thead>
+                <tr class="bg-gray-200">
+                    <th class="py-2 px-4 border-b">ID</th>
+                    <th class="py-2 px-4 border-b">Producto</th>
+                    <th class="py-2 px-4 border-b">Stock Disponible</th>
+                    <th class="py-2 px-4 border-b">Última Actualización</th>
+                    <th class="py-2 px-4 border-b">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let inventory of inventarios" class="hover:bg-gray-100">
+                    <td class="py-2 px-4 border-b">{{ inventory.id_inventario }}</td>
+                    <td class="py-2 px-4 border-b">{{ inventory.producto }}</td>
+                    <td class="py-2 px-4 border-b">{{ inventory.cantidad }}</td>
+                    <td class="py-2 px-4 border-b">{{ formatDateTime(inventory.fecha.toString()) }}</td>
+                    <td class="py-2 px-4 border-b">
+                        <button *ngIf="perm_editar" class="bg-green-500 text-white py-1 px-2 rounded hover:bg-green-600 mr-2"
+                            (click)="openStockModal(inventory.id_inventario)">
+                            Añadir Stock
+                        </button>
+                        <button *ngIf="perm_eliminar" class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600"
+                            (click)="deleteInventory(inventory.id_inventario)">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Menú emergente para añadir stock -->
+    <div *ngIf="showStockModal" class="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-6 rounded shadow-md">
+            <h2 class="text-xl font-bold mb-4">Añadir Stock</h2>
+            <label class="block text-gray-700 mb-2">Cantidad a agregar:</label>
+            <input type="number" [(ngModel)]="stockToAdd" class="w-full px-3 py-2 border rounded"
+                placeholder="Ingresa la cantidad" />
+            <div class="flex gap-4 mt-4">
+                <button class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600"
+                    (click)="confirmAddStock()">
+                    Confirmar
+                </button>
+                <button class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600" (click)="closeStockModal()">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

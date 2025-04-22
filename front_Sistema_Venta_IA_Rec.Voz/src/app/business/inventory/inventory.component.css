@@ -1,0 +1,9 @@
+/* Solo el número se resalta en rojo y negrita cuando el stock es bajo */
+.text-red-500 {
+    color: #f56565;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+

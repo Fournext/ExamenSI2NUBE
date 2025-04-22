@@ -1,0 +1,45 @@
+<div class="min-h-screen bg-gradient-to-br from-blue-100 via-purple-200 to-pink-200 flex items-center justify-center">
+    <div class="bg-white rounded-2xl shadow-xl p-10 max-w-md w-full">
+      <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-6">🔐 Iniciar Sesión</h2>
+  
+      <div class="mb-5">
+        <label class="block text-gray-700 font-semibold mb-1">👤 Usuario:</label>
+        <input
+          type="text"
+          [(ngModel)]="username"
+          class="w-full border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 p-3 rounded-lg transition duration-200 outline-none placeholder-gray-400"
+          placeholder=""
+        />
+      </div>
+  
+      <div class="mb-5">
+        <label class="block text-gray-700 font-semibold mb-1">🔒 Contraseña:</label>
+        <input
+          type="password"
+          [(ngModel)]="password"
+          class="w-full border border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-300 p-3 rounded-lg transition duration-200 outline-none placeholder-gray-400"
+          placeholder="••••••••"
+        />
+      </div>
+  
+      <button
+        (click)="login()"
+        class="bg-gradient-to-r from-purple-500 to-pink-500 text-white w-full py-3 rounded-lg font-semibold shadow-md hover:shadow-lg hover:from-purple-600 hover:to-pink-600 transition duration-300"
+      >
+        Ingresar
+      </button>
+  
+      <div class="flex justify-between items-center mt-4 text-sm">
+        <span class="text-gray-500">¿Olvidaste tu contraseña?</span>
+        <a routerLink="/recover_password" class="text-purple-600 hover:underline cursor-pointer">Recuperar</a>
+      </div>
+  
+      <div *ngIf="error" class="text-red-600 mt-4 text-sm text-center font-medium">
+        {{ error }}
+      </div>
+      <div *ngIf="success" class="text-green-600 mt-4 text-sm text-center font-medium">
+        ✅ ¡Bienvenido!
+      </div>
+    </div>
+  </div>
+  

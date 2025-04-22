@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+body {
+    background-color: #adadad; /* Cambia el color al que prefieras */
+}
+
+/* Cambiar posición y estilo del toast */

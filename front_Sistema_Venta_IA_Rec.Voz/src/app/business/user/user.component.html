@@ -1,0 +1,143 @@
+<div class="p-6 bg-gray-100 min-h-screen">
+    <h1 class="text-2xl font-bold text-gray-700 mb-6">Gestión de Usuarios - Empleados</h1>
+  
+    <!-- Botón para mostrar/ocultar formulario -->
+    <button class="mb-4 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600" (click)="toggleForm()">
+      {{ showForm ? 'Cerrar Formulario' : 'Agregar Usuario' }}
+    </button>
+  
+    <!-- Formulario de Registro/Edición -->
+    <div *ngIf="showForm" class="bg-white p-6 shadow-md rounded mb-6">
+      <h2 class="text-xl font-semibold mb-4">{{ editar ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+      
+      <form (ngSubmit)="addUser()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-700">Nombre completo:</label>
+            <input type="text" [(ngModel)]="newEmpleado.nombre_completo" name="nombre" class="w-full px-3 py-2 border rounded" placeholder="Ingresa el nombre" required />
+          </div>
+  
+          <div>
+            <label class="block text-gray-700">Dirección:</label>
+            <input type="text" [(ngModel)]="newEmpleado.direccion" name="direccion" class="w-full px-3 py-2 border rounded" placeholder="Ingresa la dirección" required />
+          </div>
+  
+          <div>
+            <label class="block text-gray-700">Teléfono:</label>
+            <input type="tel" [(ngModel)]="newEmpleado.telefono" name="telefono" class="w-full px-3 py-2 border rounded" placeholder="Ingresa el teléfono" required />
+          </div>
+  
+          <div>
+            <label class="block text-gray-700">Estado:</label>
+            <select [(ngModel)]="newEmpleado.estado" name="estado" class="w-full px-3 py-2 border rounded" required>
+              <option value="" disabled selected>Selecciona un estado</option>
+              <option value="activo">Activo</option>
+              <option value="eliminado">Eliminado</option>
+            </select>
+          </div>
+  
+          <div>
+            <label class="block text-gray-700">Fecha de Nacimiento:</label>
+            <input type="date" [(ngModel)]="newEmpleado.fecha_nacimiento" name="fechaNacimiento" class="w-full px-3 py-2 border rounded" required />
+          </div>
+  
+          <div>
+            <label class="block text-gray-700">Rol:</label>
+            <select [(ngModel)]="newEmpleado.rol" name="rol" class="w-full px-3 py-2 border rounded" required>
+              <option value="" disabled selected>Selecciona un rol</option>
+              <option value="Administrador">Administrador</option>
+              <option value="Empleado">Empleado</option>
+            </select>
+          </div>
+  
+          <!-- Solo si es nuevo usuario -->
+          <ng-container *ngIf="!editar">
+            <div>
+              <label class="block text-gray-700">Username:</label>
+              <input type="text" [(ngModel)]="newUsername" name="username" class="w-full px-3 py-2 border rounded" placeholder="Ingresa el username" required />
+            </div>
+  
+            <div>
+              <label class="block text-gray-700">Email:</label>
+              <input type="email" [(ngModel)]="newUser.email" name="email" class="w-full px-3 py-2 border rounded" placeholder="Ingresa el email" required />
+            </div>
+  
+            <div>
+              <label class="block text-gray-700">Password:</label>
+              <input type="password" [(ngModel)]="newUser.password" name="password" class="w-full px-3 py-2 border rounded" placeholder="Ingresa el password" required />
+            </div>
+          </ng-container>
+        </div>
+  
+        <!-- Botones -->
+        <div class="flex gap-4 mt-6">
+          <button type="submit" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Guardar</button>
+          <button type="button" (click)="toggleForm()" class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  
+    <!-- Panel de Permisos -->
+    <div *ngIf="showPermisos" class="bg-white p-6 shadow-md rounded mb-6 border border-gray-300">
+      <h2 class="text-xl font-semibold mb-4">Permisos de Usuario: {{ permisosUsername }}</h2>
+  
+      <div class="mb-4">
+        <label class="block text-gray-700">Ventana:</label>
+        <select 
+            [(ngModel)]="permisoSeleccionado.ventana" 
+            name="ventana" 
+            class="w-full px-3 py-2 border rounded"
+            (change)="cargarPermisoVentanaSeleccionada()">
+            <option *ngFor="let ventana of ventanasDisponibles" [value]="ventana">{{ ventana }}</option>
+        </select>
+
+      </div>
+  
+      <div class="mb-4 flex gap-6">
+        <label class="inline-flex items-center"><input type="checkbox" [(ngModel)]="permisoSeleccionado.ver" class="form-checkbox" /> <span class="ml-2">Ver</span></label>
+        <label class="inline-flex items-center"><input type="checkbox" [(ngModel)]="permisoSeleccionado.insertar" class="form-checkbox" /> <span class="ml-2">Insertar</span></label>
+        <label class="inline-flex items-center"><input type="checkbox" [(ngModel)]="permisoSeleccionado.editar" class="form-checkbox" /> <span class="ml-2">Editar</span></label>
+        <label class="inline-flex items-center"><input type="checkbox" [(ngModel)]="permisoSeleccionado.eliminar" class="form-checkbox" /> <span class="ml-2">Eliminar</span></label>
+      </div>
+  
+      <div class="flex gap-4">
+        <button (click)="guardarPermiso()" class="bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Guardar Permiso</button>
+        <button (click)="cancelarPermisos()" class="bg-gray-500 text-white py-2 px-4 rounded hover:bg-gray-600">Cancelar</button>
+      </div>
+    </div>
+  
+    <!-- Tabla de Usuarios -->
+    <div class="overflow-x-auto bg-white shadow-md rounded">
+      <table class="w-full text-sm text-left border-collapse">
+        <thead class="bg-gray-200">
+          <tr>
+            <th class="py-2 px-4 border-b">ID</th>
+            <th class="py-2 px-4 border-b">Nombre</th>
+            <th class="py-2 px-4 border-b">Dirección</th>
+            <th class="py-2 px-4 border-b">Teléfono</th>
+            <th class="py-2 px-4 border-b">Estado</th>
+            <th class="py-2 px-4 border-b">Nacimiento</th>
+            <th class="py-2 px-4 border-b">Rol</th>
+            <th class="py-2 px-4 border-b">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let empleado of empleados" class="hover:bg-gray-100">
+            <td class="py-2 px-4 border-b">{{ empleado.id_usuario }}</td>
+            <td class="py-2 px-4 border-b">{{ empleado.nombre_completo }}</td>
+            <td class="py-2 px-4 border-b">{{ empleado.direccion }}</td>
+            <td class="py-2 px-4 border-b">{{ empleado.telefono }}</td>
+            <td class="py-2 px-4 border-b">{{ empleado.estado }}</td>
+            <td class="py-2 px-4 border-b">{{ empleado.fecha_nacimiento }}</td>
+            <td class="py-2 px-4 border-b">{{ empleado.rol }}</td>
+            <td class="py-2 px-4 border-b space-x-2">
+              <button class="bg-yellow-500 text-white py-1 px-2 rounded hover:bg-yellow-600" (click)="editUser(empleado.nombre_completo)">Editar</button>
+              <button class="bg-blue-500 text-white py-1 px-2 rounded hover:bg-blue-600" (click)="abrirPanelPermisos(empleado.id_usuario)">Permisos</button>
+              <button class="bg-red-500 text-white py-1 px-2 rounded hover:bg-red-600" (click)="deleteUser(empleado.nombre_completo)">Eliminar</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  

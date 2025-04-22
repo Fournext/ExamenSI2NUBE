@@ -1,0 +1,24 @@
+/* Contenedor responsivo */
+.overflow-x-auto {
+    overflow-x: auto; /* Habilita el desplazamiento horizontal */
+}
+
+/* Ajustes para la tabla */
+table {
+    width: 100%;
+    border-collapse: collapse; /* Elimina espacios entre celdas */
+}
+
+th, td {
+    padding: 8px;
+    white-space: nowrap; /* Evita saltos de línea automáticos */
+    text-align: left; /* Alineación izquierda */
+    border: 1px solid #ccc; /* Bordes claros */
+}
+
+@media (max-width: 768px) {
+    th, td {
+        font-size: 12px; /* Tamaño de texto reducido */
+        padding: 4px; /* Reduce el espaciado */
+    }
+}
